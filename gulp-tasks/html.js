@@ -172,7 +172,7 @@ function dustDataProvide(file, buildData) {
         }
     }
 
-    return Object.assign(base, override);
+    return deepAssign(base, override);
 }
 
 function getDataProvider(buildData) {
