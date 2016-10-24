@@ -161,6 +161,8 @@ function dustDataProvide(file, buildData) {
         override = require(dataPath);
     } catch (ex) { }
 
+    override.language = language;
+
     if (folder && template && language) {
         if (buildData[folder] &&
             buildData[folder][template] &&
