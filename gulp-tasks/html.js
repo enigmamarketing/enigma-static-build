@@ -66,6 +66,10 @@ function dustError(message, helperName, chunk, context) {
         data = '\nData:\n' + chalk.yellow((chunk.data || []).join('\n'));
     }
 
+    if (data.length > 100) {
+        data = data.substr(0, 100) + '...';
+    }
+
     chunk.setError(
         'Helper ' + chalk.green('@' + helperName) +
         ' in \'' + chalk.green(context.templateName) + '\'' +
