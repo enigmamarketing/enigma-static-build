@@ -59,23 +59,38 @@ function escapeAllNonDust(str) {
     return str;
 }
 
-function dustError(message, helperName, chunk, context) {
-    var data = '';
+function dustError(message, helperName, chunk, context, dataOverride) {
+    var data = '',
+        render = '',
+        renderDepth = dust.helpers.render.depth;
 
-    if ((chunk.data || []).length > 0) {
-        data = '\nData:\n' + chalk.yellow((chunk.data || []).join('\n'));
+    if (dataOverride) {
+        data = dataOverride;
+    } else if ((chunk.data || []).length > 0 && renderDepth > 0) {
+        data = (chunk.data || []).join('\n\n    ');
     }
 
-    if (data.length > 100) {
-        data = data.substr(0, 100) + '...';
+    if (data.length > 0) {
+        data = '\n' + chalk.green('Data') + ':\n    ' + data;
     }
 
-    chunk.setError(
-        'Helper ' + chalk.green('@' + helperName) +
-        ' in \'' + chalk.green(context.templateName) + '\'' +
-        ': ' + chalk.white.bgRed(message) +
-        data
-    );
+    if (renderDepth > 0) {
+        render = ' within ' + chalk.green('@render');
+
+        if (renderDepth > 1) {
+            render += chalk.yellow(' x' + renderDepth);
+        }
+    }
+
+    chunk.setError('\n' +
+        chalk.green('@' + helperName) +
+        render +
+        ' in \'' + chalk.green(context.getTemplateName()) + '\'' +
+        ': \n    ' + chalk.white.bgRed(message) +
+        (renderDepth > 0 ? '\n    Error likely in the build document.' : '') +
+        '\n' + chalk.green('Language') + ': ' + chalk.cyan(context.get('language')) +
+        data +
+    '\n');
 }
 
 dust.helpers.link = function (chunk, context, bodies, params) {
@@ -120,13 +135,21 @@ dust.helpers.render = function (chunk, context, bodies, params) {
     }
 
     try {
+        dust.helpers.render.depth += 1;
         chunk.write(renderSource(escapeAllNonDust(template), context));
     } catch (error) {
-        throw error;
+        if (typeof(error) == 'string') {
+            chunk.setError(error);
+        } else {
+            dustError(error.message, 'render', chunk, context, template);
+        }
+    } finally {
+        dust.helpers.render.depth -= 1;
     }
 
     return chunk;
 };
+dust.helpers.render.depth = 0;
 
 function wrappingHelper(tag, attributes) {
     var attribute,
@@ -214,7 +237,7 @@ function getBuildData() {
         try {
             deepAssign(buildData, buildDocParse(path.join(docsDir, filename)));
         } catch (error) {
-            throw error;
+            throw chalk.white.bgRed('Check build document') + ': ' + error;
         }
     });
 
