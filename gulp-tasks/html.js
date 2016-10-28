@@ -5,6 +5,7 @@ var path = require('path');
 var buildDocParse = require('build-doc-parse');
 var deasync = require('deasync');
 var deepAssign = require('deep-assign');
+var chalk = require('chalk');
 
 var dust = require('dustjs-linkedin');
 dust.helpers = require('dustjs-helpers').helpers;
@@ -58,20 +59,35 @@ function escapeAllNonDust(str) {
     return str;
 }
 
+function dustError(message, helperName, chunk, context) {
+    var data = '';
+
+    if ((chunk.data || []).length > 0) {
+        data = '\nData:\n' + chalk.yellow((chunk.data || []).join('\n'));
+    }
+
+    chunk.setError(
+        'Helper ' + chalk.green('@' + helperName) +
+        ' in \'' + chalk.green(context.templateName) + '\'' +
+        ': ' + chalk.white.bgRed(message) +
+        data
+    );
+}
+
 dust.helpers.link = function (chunk, context, bodies, params) {
     var link = params.key,
         attribute, attributes = [];
 
     if (!params.hasOwnProperty('key')) {
-        chunk.setError('Parameter "key" is required!');
+        dustError('No key given to link!', 'link', chunk, context);
         return chunk;
     } else if (link === undefined) {
-        chunk.setError('Provided key is undefined.');
+        dustError('Link key doesn\'t exist!', 'link', chunk, context);
         return chunk;
     }
 
     if (!link.content) {
-        chunk.setError('No content given for link.');
+        dustError('No content given for link.', 'link', chunk, context);
         return chunk;
     }
 
@@ -92,10 +108,10 @@ dust.helpers.render = function (chunk, context, bodies, params) {
         renderSource = deasync(dust.renderSource);
 
     if (!params.hasOwnProperty('key')) {
-        chunk.setError('Parameter "key" is required!');
+        dustError('No key given to render!', 'render', chunk, context);
         return chunk;
     } else if (template === undefined) {
-        chunk.setError('Provided key is undefined.');
+        dustError('Key doesn\'t exist!', 'render', chunk, context);
         return chunk;
     }
 
@@ -170,7 +186,7 @@ function dustDataProvide(file, buildData) {
 
             base = buildData[folder][template][language];
         } else {
-            console.warn('No data found in build document for %s.%s, language: %s', folder, template, language);
+            console.warn(chalk.yellow('No data found in build document for %s.%s, language: %s'), folder, template, language);
         }
     }
 
