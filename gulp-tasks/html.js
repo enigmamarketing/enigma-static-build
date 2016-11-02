@@ -259,16 +259,11 @@ module.exports = function (gulp) {
             };
 
         return merge(
-            gulp.src(['public/html/**/*.dust', '!public/html/**/partials/**'])
+            gulp.src(['public/*/**/*.dust', '!public/*/**/partials/**'])
                 .pipe(plumber({ errorHandler: errorHandler }))
                 .pipe(dustHtml(dustOptions))
                 .pipe(plumber.stop())
-                .pipe(gulp.dest('../dist/html/'),
-            gulp.src(['public/email/**/*.dust', '!public/email/**/partials/**'])
-                .pipe(plumber({ errorHandler: errorHandler }))
-                .pipe(dustHtml(dustOptions))
-                .pipe(plumber.stop())
-                .pipe(gulp.dest('../dist/email/')))
+                .pipe(gulp.dest('../dist/'))
         );
     };
 };

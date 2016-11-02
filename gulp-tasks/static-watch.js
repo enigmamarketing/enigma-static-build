@@ -5,10 +5,11 @@ module.exports = function (gulp, taskPrefix) {
     var watch = require('gulp-watch');
 
     return function () {
-        return watch(['public/email/images/**/*',
-                      'public/html/images/**/*',
-                      'public/html/assets/**/*',
-                      'public/html/js/lib/**/*'], function () {
+        return watch([
+            'public/*/images/**/*',
+            'public/*/assets/**/*',
+            'public/*/js/lib/**/*'
+        ], function () {
             gulp.start(taskPrefix + 'static');
         });
     };

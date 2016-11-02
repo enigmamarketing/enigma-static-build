@@ -2,6 +2,8 @@
 'use strict';
 
 module.exports = function (gulp) {
+    var fs = require('fs');
+    var path = require('path');
     var plumber = require('gulp-plumber');
     var errorHandler = require('../gulp-error-handler');
     var sourcemaps = require('gulp-sourcemaps');
@@ -11,30 +13,35 @@ module.exports = function (gulp) {
     var merge = require('merge-stream');
 
     return function () {
-        var jslinted =
-                gulp.src(['public/html/js/**/*.js', '!public/html/js/lib/**'])
+        var stream = merge();
+
+        stream.add(
+            gulp.src(['public/*/js/**/*.js', '!public/*/js/lib/**'])
                 .pipe(plumber({ errorHandler: errorHandler }))
                 .pipe(jslint())
-                .pipe(plumber.stop()),
-
-            browserified = gulp.src(['public/html/js/*.js', '!public/html/js/serviceWorker.js'])
-                .pipe(plumber({ errorHandler: errorHandler }))
-                .pipe(browser.browserify())
-                .pipe(sourcemaps.init())
-                .pipe(uglify())
-                .pipe(sourcemaps.write('./'))
                 .pipe(plumber.stop())
-                .pipe(gulp.dest('../dist/html/js/')),
+        );
 
-            serviceWorker = gulp.src('public/html/js/serviceWorker.js')
-                .pipe(plumber({ errorHandler: errorHandler }))
-                .pipe(browser.browserify())
-                .pipe(sourcemaps.init())
-                .pipe(uglify())
-                .pipe(sourcemaps.write('./'))
-                .pipe(plumber.stop())
-                .pipe(gulp.dest('../dist/html/'));
+        fs.readdirSync('./public').forEach(
+            function (filename) {
+                var stats = fs.lstatSync(path.join('./public', filename));
 
-        return merge(jslinted, browserified, serviceWorker);
+                if (stats.isDirectory()) {
+                    console.log('adding', filename);
+                    stream.add(
+                        gulp.src(['public/' + filename + '/js/*.js'])
+                            .pipe(plumber({ errorHandler: errorHandler }))
+                            .pipe(browser.browserify())
+                            .pipe(sourcemaps.init())
+                            .pipe(uglify())
+                            .pipe(sourcemaps.write('./'))
+                            .pipe(plumber.stop())
+                            .pipe(gulp.dest('../dist/' + filename + '/js/'))
+                    );
+                }
+            }
+        );
+
+        return stream;
     };
 };

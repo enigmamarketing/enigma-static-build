@@ -5,7 +5,10 @@ module.exports = function (gulp, taskPrefix) {
     var watch = require('gulp-watch');
 
     return function () {
-        return watch(['public/html/js/**/*.js', '!public/html/js/lib/**'], function () {
+        return watch([
+            'public/*/js/**/*.js',
+            '!public/*/js/lib/**'
+        ], function () {
             gulp.start(taskPrefix + 'js');
         });
     };

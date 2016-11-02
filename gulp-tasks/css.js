@@ -11,7 +11,7 @@ module.exports = function (gulp) {
     var sourcemaps = require('gulp-sourcemaps');
 
     return function () {
-        return gulp.src('public/html/css/*.scss')
+        return gulp.src('public/*/css/*.scss')
             .pipe(plumber({ errorHandler: errorHandler }))
             .pipe(sourcemaps.init())
             .pipe(sass())
@@ -23,6 +23,6 @@ module.exports = function (gulp) {
             .pipe(nano())
             .pipe(sourcemaps.write('./'))
             .pipe(plumber.stop())
-            .pipe(gulp.dest('../dist/html/css'));
+            .pipe(gulp.dest('../dist'));
     };
 };

@@ -6,10 +6,9 @@ module.exports = function (gulp) {
 
     return function () {
         return merge(
-            gulp.src('public/email/images/**/*').pipe(gulp.dest('../dist/email/images/')),
-            gulp.src('public/html/images/**/*').pipe(gulp.dest('../dist/html/images/')),
-            gulp.src('public/html/assets/**/*').pipe(gulp.dest('../dist/html/assets/')),
-            gulp.src('public/html/js/lib/**/*').pipe(gulp.dest('../dist/html/js/lib/'))
+            gulp.src('public/*/images/**/*').pipe(gulp.dest('../dist')),
+            gulp.src('public/*/assets/**/*').pipe(gulp.dest('../dist')),
+            gulp.src('public/*/js/lib/**/*').pipe(gulp.dest('../dist'))
         );
     };
 };

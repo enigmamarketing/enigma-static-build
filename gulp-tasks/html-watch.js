@@ -6,13 +6,12 @@ module.exports = function (gulp, taskPrefix) {
 
     return function () {
         return watch([
-            'public/email/**/*.dust',
-            'public/email/**/*.json',
-            'public/html/**/*.dust',
-            'public/html/**/*.json',
-            'public/html/**/*.js',
+            'public/*/**/*.dust',
+            'public/*/**/*.json',
+            'public/*/**/*.js',
             'public/*.xlsx',
-            '!public/~$*.xlsx'
+            '!public/~$*.xlsx',
+            '!public/*/js/**/*'
         ], function () {
             gulp.start(taskPrefix + 'html');
         });
