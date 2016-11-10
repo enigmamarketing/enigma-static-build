@@ -27,7 +27,6 @@ module.exports = function (gulp) {
                 var stats = fs.lstatSync(path.join('./public', filename));
 
                 if (stats.isDirectory()) {
-                    console.log('adding', filename);
                     stream.add(
                         gulp.src(['public/' + filename + '/js/*.js'])
                             .pipe(plumber({ errorHandler: errorHandler }))
