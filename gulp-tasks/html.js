@@ -206,7 +206,7 @@ function dustDataProvide(file, buildData) {
 
     override.language = language;
 
-    console.info('Building template "%s/%s-%s"...', folder, template, language);
+    console.info('Building template \'%s\'...', chalk.green(folder + '/' + template + '-' + language));
 
     if (folder && template && language) {
         if (buildData[folder] &&
@@ -215,7 +215,7 @@ function dustDataProvide(file, buildData) {
 
             base = buildData[folder][template][language];
         } else {
-            console.warn(chalk.yellow('No data found in build documents for "%s/%s-%s".'), folder, template, language);
+            console.warn(chalk.yellow('No data found in build documents for \'%s\'.'), chalk.green(folder + '/' + template + '-' + language));
         }
     }
 
@@ -239,7 +239,7 @@ function getBuildData() {
         try {
             deepAssign(buildData, buildDocParse(path.join(docsDir, filename)));
         } catch (error) {
-            throw new Error(chalk.white.bgRed('Found in "' + filename + '"') + ': ' + error.message);
+            throw new Error(chalk.white.bgRed('Found in \'' + filename + '\'') + ': ' + error.message);
         }
     });
 
