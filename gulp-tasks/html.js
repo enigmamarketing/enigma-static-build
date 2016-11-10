@@ -206,6 +206,8 @@ function dustDataProvide(file, buildData) {
 
     override.language = language;
 
+    console.info('Building template "%s/%s-%s"...', folder, template, language);
+
     if (folder && template && language) {
         if (buildData[folder] &&
             buildData[folder][template] &&
@@ -213,7 +215,7 @@ function dustDataProvide(file, buildData) {
 
             base = buildData[folder][template][language];
         } else {
-            console.warn(chalk.yellow('No data found in build document for %s.%s, language: %s'), folder, template, language);
+            console.warn(chalk.yellow('No data found in build documents for "%s/%s-%s".'), folder, template, language);
         }
     }
 
