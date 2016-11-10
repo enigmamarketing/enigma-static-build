@@ -237,7 +237,7 @@ function getBuildData() {
         try {
             deepAssign(buildData, buildDocParse(path.join(docsDir, filename)));
         } catch (error) {
-            throw chalk.white.bgRed('Check build document') + ': ' + error;
+            throw chalk.white.bgRed('Error parsing ' + filename) + ': ' + error;
         }
     });
 
