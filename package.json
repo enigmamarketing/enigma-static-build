@@ -1,6 +1,6 @@
 {
   "name": "enigma-static-build",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -28,6 +28,7 @@
     "del": "^2.2.0",
     "dustjs-helpers": "^1.7.3",
     "dustjs-linkedin": "^2.7.2",
+    "dust-naming-convention-filters": "^0.1.0",
     "gulp": "^3.9.0",
     "gulp-batch": "^1.0.5",
     "gulp-browser": "^3.0.2",

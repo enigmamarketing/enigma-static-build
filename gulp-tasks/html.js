@@ -11,6 +11,8 @@ var dust = require('dustjs-linkedin');
 dust.helpers = require('dustjs-helpers').helpers;
 dust.config.cache = false;
 
+require('dust-naming-convention-filters')(dust);
+
 function escapeAllNonDust(str) {
     var dustDepth = 0,
         currentIndex = 0,
