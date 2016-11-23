@@ -45,7 +45,7 @@ function escapeAllNonDust(str) {
             if (nextClose === -1) { nextClose = Infinity; }
 
             if (nextOpen === Infinity && nextClose === Infinity) {
-                break;
+                throw new Error('Unmatched bracket!');
             }
 
             if (nextOpen < nextClose) {
