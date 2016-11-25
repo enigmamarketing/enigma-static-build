@@ -13,27 +13,35 @@ dust.config.cache = false;
 
 require('dust-naming-convention-filters')(dust);
 
+function escapeChunk(str, start, end) {
+    var original = str.substring(start, end),
+        escaped = dust.escapeHtml(original);
+
+    return {
+        chunk: str.substring(0, start) + escaped + str.substring(end),
+        delta: escaped.length - original.length
+    };
+}
+
 function escapeAllNonDust(str) {
     var dustDepth = 0,
         currentIndex = 0,
-        nextOpen, nextClose;
+        nextOpen, nextClose,
+        escaped;
 
     while (true) {
         if (dustDepth === 0) {
             nextOpen = str.indexOf('{', currentIndex);
 
             if (nextOpen >= 0) {
-                str =
-                    str.substring(0, currentIndex) +
-                    dust.escapeHtml(str.substring(currentIndex, nextOpen)) +
-                    str.substring(nextOpen);
+                escaped = escapeChunk(str, currentIndex, nextOpen);
 
-                currentIndex = nextOpen + 1;
+                str = escaped.chunk;
+
+                currentIndex = nextOpen + 1 + escaped.delta;
                 dustDepth += 1;
             } else {
-                str =
-                    str.substring(0, currentIndex) +
-                    dust.escapeHtml(str.substring(currentIndex));
+                str = escapeChunk(str, currentIndex, str.length).chunk;
 
                 break;
             }
