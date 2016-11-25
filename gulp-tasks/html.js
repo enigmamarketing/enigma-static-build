@@ -260,7 +260,6 @@ module.exports = function (gulp) {
     var plumber = require('gulp-plumber');
     var errorHandler = require('../gulp-error-handler');
     var dustHtml = require('gulp-dust-html');
-    var merge = require('merge-stream');
 
     return function () {
         var buildData = getBuildData(),
@@ -270,12 +269,10 @@ module.exports = function (gulp) {
                 whitespace: true
             };
 
-        return merge(
-            gulp.src(['public/*/**/*.dust', '!public/*/**/partials/**'])
-                .pipe(plumber({ errorHandler: errorHandler }))
-                .pipe(dustHtml(dustOptions))
-                .pipe(plumber.stop())
-                .pipe(gulp.dest('../dist/'))
-        );
+        return gulp.src(['public/*/**/*.dust', '!public/*/**/partials/**'])
+            .pipe(plumber({ errorHandler: errorHandler }))
+            .pipe(dustHtml(dustOptions))
+            .pipe(plumber.stop())
+            .pipe(gulp.dest('../dist/'));
     };
 };
