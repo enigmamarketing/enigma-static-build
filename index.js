@@ -1,10 +1,13 @@
 /*jslint node:true */
 'use strict';
 
+var chalk = require('chalk');
+
 module.exports = function (gulp, projectRoot) {
     var path = require('path'),
         tasksPath = path.join(__dirname, 'gulp-tasks'),
-        taskPrefix = 'enigma.';
+        taskPrefix = 'enigma.',
+        deployment = loadDeployment(gulp, projectRoot, taskPrefix);
 
     // Load all gulp tasks, using the name of each file in the tasksPath as the name of the task.
     require('fs').readdirSync(tasksPath).forEach(
@@ -33,4 +36,26 @@ module.exports = function (gulp, projectRoot) {
         taskPrefix + 'js-watch',
         taskPrefix + 'static-watch'
     ]);
+
+    if (!deployment) {
+        gulp.task(taskPrefix + 'deploy', showNoDeploymentMessage);
+        gulp.task(taskPrefix + 'configure', showNoDeploymentMessage);
+    }
 };
+
+function loadDeployment(gulp, projectRoot, taskPrefix) {
+    try {
+        return require('enigma-static-build-deployment')(gulp, projectRoot, taskPrefix);
+    } catch (ex) {
+        return false;
+    }
+}
+
+function showNoDeploymentMessage() {
+    console.log(
+        '\n' +
+        chalk.white.bgRed('Deployments unavailable!') + '\n' +
+        'Do you have access to the module?' +
+        '\n'
+    );
+}
