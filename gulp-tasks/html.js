@@ -133,8 +133,7 @@ dust.helpers.link = function (chunk, context, bodies, params) {
 };
 
 dust.helpers.render = function (chunk, context, bodies, params) {
-    var template = params.key,
-        renderSource = deasync(dust.renderSource);
+    var template = params.key;
 
     if (!params.hasOwnProperty('key')) {
         dustError('No key given to render!', 'render', chunk, context);
@@ -144,20 +143,27 @@ dust.helpers.render = function (chunk, context, bodies, params) {
         return chunk;
     }
 
-    try {
-        dust.helpers.render.depth += 1;
-        chunk.write(renderSource(escapeAllNonDust(template), context));
-    } catch (error) {
-        if (typeof(error) == 'string') {
-            chunk.setError(error);
-        } else {
-            dustError(error.message, 'render', chunk, context, template);
-        }
-    } finally {
-        dust.helpers.render.depth -= 1;
-    }
+    return chunk.map(chunk => {
+        try {
+            dust.helpers.render.depth += 1;
 
-    return chunk;
+            dust.renderSource(escapeAllNonDust(template), context, (error, output) => {
+                if (error) {
+                    throw error;
+                } else {
+                    chunk.write(output);
+                    chunk.end();
+                    dust.helpers.render.depth -= 1;
+                }
+            });
+        } catch (error) {
+            if (typeof(error) === 'string') {
+                chunk.setError(error);
+            } else {
+                dustError(error.message, 'render', chunk, context, template);
+            }
+        }
+    });
 };
 dust.helpers.render.depth = 0;
 
