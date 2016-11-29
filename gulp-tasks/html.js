@@ -191,6 +191,8 @@ function wrappingHelper(tag, attributes) {
 dust.helpers.b = wrappingHelper('strong');
 dust.helpers.u = wrappingHelper('u');
 dust.helpers.i = wrappingHelper('em');
+dust.helpers.sub = wrappingHelper('sub');
+dust.helpers.sup = wrappingHelper('sup');
 dust.helpers.br = function (chunk) { return chunk.write('<br/>'); };
 
 function dustDataProvide(file, buildData) {
