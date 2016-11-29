@@ -144,25 +144,22 @@ dust.helpers.render = function (chunk, context, bodies, params) {
     }
 
     return chunk.map(chunk => {
-        try {
-            dust.helpers.render.depth += 1;
+        dust.helpers.render.depth += 1;
 
-            dust.renderSource(escapeAllNonDust(template), context, (error, output) => {
-                if (error) {
-                    throw error;
+        dust.renderSource(escapeAllNonDust(template), context, (error, output) => {
+            dust.helpers.render.depth -= 1;
+
+            if (error) {
+                if (typeof(error) === 'string') {
+                    chunk.setError(error);
                 } else {
-                    chunk.write(output);
-                    chunk.end();
-                    dust.helpers.render.depth -= 1;
+                    dustError(error.message, 'render', chunk, context, template);
                 }
-            });
-        } catch (error) {
-            if (typeof(error) === 'string') {
-                chunk.setError(error);
             } else {
-                dustError(error.message, 'render', chunk, context, template);
+                chunk.write(output);
+                chunk.end();
             }
-        }
+        });
     });
 };
 dust.helpers.render.depth = 0;
