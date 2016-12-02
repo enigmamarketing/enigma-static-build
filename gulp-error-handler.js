@@ -1,4 +1,3 @@
-/*jslint node:true */
 'use strict';
 
 var chalk = require('chalk');
@@ -12,6 +11,10 @@ module.exports = function (error) {
             chalk.white.bgRed(error.name) + '\n    ' +
             error.message.trim().replace(/\n/g, '\n    ') +
         '\n');
+    }
+
+    if (error.cause) {
+        console.dir(error.cause.message);
     }
 
     this.emit('end');

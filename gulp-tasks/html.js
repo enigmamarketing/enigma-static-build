@@ -1,4 +1,4 @@
-/*jslint node: true, continue: true */
+/*jslint continue: true */
 'use strict';
 
 var path = require('path');
