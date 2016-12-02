@@ -2,11 +2,11 @@
 
 var chalk = require('chalk');
 
-module.exports = function (gulp, projectRoot) {
+module.exports = function (gulp, projectRoot, createPrefixlessTasks) {
     var path = require('path'),
         tasksPath = path.join(__dirname, 'gulp-tasks'),
         taskPrefix = 'enigma.',
-        deployment = loadDeployment(gulp, projectRoot, taskPrefix);
+        deploymentTasks = loadDeployment(gulp, projectRoot, taskPrefix);
 
     // Load all gulp tasks, using the name of each file in the tasksPath as the name of the task.
     require('fs').readdirSync(tasksPath).forEach(
@@ -36,9 +36,27 @@ module.exports = function (gulp, projectRoot) {
         taskPrefix + 'static-watch'
     ]);
 
-    if (!deployment) {
+    if (createPrefixlessTasks) {
+        gulp.task('build', [ taskPrefix + 'build' ]);
+        gulp.task('default', [ taskPrefix + 'default' ]);
+        gulp.task('develop', [ taskPrefix + 'develop' ]);
+        gulp.task('clean', [ taskPrefix + 'clean' ]);
+    }
+
+    if (!deploymentTasks) {
         gulp.task(taskPrefix + 'deploy', showNoDeploymentMessage);
+        gulp.task(taskPrefix + 'proof', showNoDeploymentMessage);
         gulp.task(taskPrefix + 'configure', showNoDeploymentMessage);
+
+        if (createPrefixlessTasks) {
+            gulp.task('deploy', [ taskPrefix + 'deploy' ]);
+            gulp.task('proof', [ taskPrefix + 'proof' ]);
+            gulp.task('configure', [ taskPrefix + 'configure' ]);
+        }
+    } else if (createPrefixlessTasks) {
+        deploymentTasks.forEach(task => {
+            gulp.task(task, [ taskPrefix + task ]);
+        });
     }
 };
 
