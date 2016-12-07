@@ -103,35 +103,6 @@ function dustError(message, helperName, chunk, context, dataOverride) {
     '\n');
 }
 
-dust.helpers.link = function (chunk, context, bodies, params) {
-    var link = params.key,
-        attribute, attributes = [];
-
-    if (!params.hasOwnProperty('key')) {
-        dustError('No key given to link!', 'link', chunk, context);
-        return chunk;
-    } else if (link === undefined) {
-        dustError('Link key doesn\'t exist!', 'link', chunk, context);
-        return chunk;
-    }
-
-    if (!link.content) {
-        dustError('No content given for link.', 'link', chunk, context);
-        return chunk;
-    }
-
-    for (attribute in link) {
-        if (!link.hasOwnProperty(attribute)) { continue; }
-        if (attribute === 'content') { continue; }
-
-        attributes.push(attribute + '="' + dust.escapeHtml(link[attribute]) + '"');
-    }
-
-    chunk.write('<a ' + attributes.join(' ') + '>' + dust.escapeHtml(link.content) + '</a>');
-
-    return chunk;
-};
-
 dust.helpers.render = function (chunk, context, bodies, params) {
     var template = params.key;
 
@@ -141,6 +112,10 @@ dust.helpers.render = function (chunk, context, bodies, params) {
     } else if (template === undefined) {
         dustError('Key doesn\'t exist!', 'render', chunk, context);
         return chunk;
+    }
+
+    if (typeof(template) !== typeof(template.valueOf())) {
+        context = context.push(template);
     }
 
     return chunk.map(chunk => {
@@ -164,20 +139,82 @@ dust.helpers.render = function (chunk, context, bodies, params) {
 };
 dust.helpers.render.depth = 0;
 
-function wrappingHelper(tag, attributes) {
-    var attribute,
-        attributeString = [];
+dust.helpers.link = function (chunk, context, bodies, params) {
+    var link = params.key,
+        name = params.name || 'link',
+        attribute, attributes = [],
+        nameContext = context.get(name);
 
-    for (attribute in attributes) {
-        if (!attributes.hasOwnProperty(attribute)) { continue; }
-
-        attributeString.push(attribute + '="' + dust.escapeHtml(attributes[attribute]) + '"');
+    if (params.hasOwnProperty('key') && link === undefined) {
+        dustError('Link key doesn\'t exist!', 'link', chunk, context);
+        return chunk;
     }
 
-    attributeString = attributeString.join(' ');
+    if (typeof(link) === 'object') {
+        context = context.push(link);
+    } else {
+        if (nameContext) {
+            context = context.push(nameContext);
+        } else {
+            if (name !== 'link') {
+                dustError('No data found for link with name \'' + name + '\'!', 'link', chunk, context);
+            } else {
+                dustError('No data found for link!', 'link', chunk, context);
+            }
+
+            return chunk;
+        }
+    }
+
+    if (!context.get('content', true)) {
+        dustError('No content given for link.', 'link', chunk, context);
+        return chunk;
+    }
+
+    link = context.stack.head || {};
+
+    for (attribute in link) {
+        if (!link.hasOwnProperty(attribute)) { continue; }
+        if (!Object.getOwnPropertyDescriptor(link, attribute).writable) { continue; }
+        if (attribute === 'content') { continue; }
+
+        attributes.push(attribute + '="' + dust.escapeHtml(link[attribute]) + '"');
+    }
+
+    chunk.write('<a ' + attributes.join(' ') + '>' + dust.escapeHtml(context.get('content', true)) + '</a>');
+
+    return chunk;
+};
+
+function wrappingHelper(tag, defaultAttributes) {
+    var attribute,
+        attributes = [];
+
+    for (attribute in defaultAttributes) {
+        if (!defaultAttributes.hasOwnProperty(attribute)) { continue; }
+        if (!Object.getOwnPropertyDescriptor(defaultAttributes, attribute).writable) { continue; }
+
+        attributes.push(attribute + '="' + dust.escapeHtml(defaultAttributes[attribute]) + '"');
+    }
 
     return function (chunk, context, bodies, params) {
-        chunk.write('<' + tag + '>');
+        var name = params.name || tag,
+            nameContext = context.get(name),
+            tagAttributes = [],
+            tagAttributeData, attribute;
+
+        if (nameContext) { context = context.push(nameContext); }
+
+        tagAttributeData = context.stack.head || {};
+
+        for (attribute in tagAttributeData) {
+            if (!tagAttributeData.hasOwnProperty(attribute)) { continue; }
+            if (!Object.getOwnPropertyDescriptor(tagAttributeData, attribute).writable) { continue; }
+
+            tagAttributes.push(attribute + '="' + dust.escapeHtml(tagAttributeData[attribute]) + '"');
+        }
+
+        chunk.write('<' + tag + ' ' + attributes.join(' ') + ' ' + tagAttributes.join(' ') + '>');
         chunk.render(bodies.block, context);
         chunk.write('</' + tag + '>');
 
@@ -190,6 +227,7 @@ dust.helpers.u = wrappingHelper('u');
 dust.helpers.i = wrappingHelper('em');
 dust.helpers.sub = wrappingHelper('sub');
 dust.helpers.sup = wrappingHelper('sup');
+dust.helpers.span = wrappingHelper('span');
 dust.helpers.br = function (chunk) { return chunk.write('<br/>'); };
 
 function dustDataProvide(file, buildData) {
