@@ -186,6 +186,21 @@ dust.helpers.link = function (chunk, context, bodies, params) {
     return chunk;
 };
 
+dust.helpers.block = function (chunk, context, bodies, params) {
+    var data = context.resolve(params.path),
+        template = context.resolve(params.template);
+
+    if (typeof(template) !== 'string') {
+        dustError('No template given for block.', 'block', chunk, context);
+        return chunk;
+    }
+
+    if (!data) { return chunk; }
+    if (Object.keys(data).length === 0) { return chunk; }
+
+    return chunk.partial(template, context.push(data));
+};
+
 function wrappingHelper(tag, defaultAttributes) {
     var attribute,
         attributes = [];
