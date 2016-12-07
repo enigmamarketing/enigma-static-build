@@ -188,7 +188,8 @@ dust.helpers.link = function (chunk, context, bodies, params) {
 
 dust.helpers.block = function (chunk, context, bodies, params) {
     var data = context.resolve(params.path),
-        template = context.resolve(params.template);
+        template = context.resolve(params.template),
+        paramData = {};
 
     if (typeof(template) !== 'string') {
         dustError('No template given for block.', 'block', chunk, context);
@@ -198,7 +199,16 @@ dust.helpers.block = function (chunk, context, bodies, params) {
     if (!data) { return chunk; }
     if (Object.keys(data).length === 0) { return chunk; }
 
-    return chunk.partial(template, context.push(data));
+    for (let param in params) {
+        if (!params.hasOwnProperty(param)) { continue; }
+        if (param === 'path' || param === 'template') { continue; }
+
+        paramData[param] = context.resolve(params[param]);
+    }
+
+    Object.assign(paramData, data);
+
+    return chunk.partial(template, context.push(paramData));
 };
 
 function wrappingHelper(tag, defaultAttributes) {
