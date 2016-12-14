@@ -159,8 +159,8 @@ dust.helpers.render = function (chunk, context, bodies, params) {
 dust.helpers.render.depth = 0;
 
 dust.helpers.link = function (chunk, context, bodies, params) {
-    var link = params.key,
-        name = params.name || 'link',
+    var link = context.resolve(params.key),
+        name = context.resolve(params.name) || 'link',
         attribute, attributes = [],
         nameContext = context.get(name);
 
@@ -242,7 +242,7 @@ function wrappingHelper(tag, defaultAttributes) {
     }
 
     return function (chunk, context, bodies, params) {
-        var name = params.name || tag,
+        var name = context.resolve(params.name) || tag,
             nameContext = context.get(name),
             tagAttributes = [],
             tagAttributeData, attribute;
