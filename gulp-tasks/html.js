@@ -104,7 +104,8 @@ function dustError(message, helperName, chunk, context, dataOverride) {
 }
 
 dust.helpers.render = function (chunk, context, bodies, params) {
-    var template = params.key;
+    var template = context.resolve(params.key),
+        filters = context.resolve(params.filter);
 
     if (!params.hasOwnProperty('key')) {
         dustError('No key given to render!', 'render', chunk, context);
@@ -116,6 +117,20 @@ dust.helpers.render = function (chunk, context, bodies, params) {
 
     if (typeof(template) !== typeof(template.valueOf())) {
         context = context.push(template);
+    }
+
+    if (filters) {
+        if (!Array.isArray(filters)) {
+            filters = [ filters + '' ]
+                .map(filter => filter.split('|')).reduce((a, b) => a.concat(b))
+                .map(filter => filter.split(',')).reduce((a, b) => a.concat(b));
+        }
+
+        filters = filters
+                .map(filter => dust.filters[filter] || filter)
+                .filter(filter => typeof(filter) === 'function');
+    } else {
+        filters = [];
     }
 
     return chunk.map(chunk => {
@@ -131,6 +146,10 @@ dust.helpers.render = function (chunk, context, bodies, params) {
                     dustError(error.message, 'render', chunk, context, template);
                 }
             } else {
+                filters.forEach(filter => {
+                    output = filter(output);
+                });
+
                 chunk.write(output);
                 chunk.end();
             }
