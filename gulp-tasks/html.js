@@ -127,8 +127,8 @@ dust.helpers.render = function (chunk, context, bodies, params) {
         }
 
         filters = filters
-                .map(filter => dust.filters[filter] || filter)
-                .filter(filter => typeof(filter) === 'function');
+            .map(filter => dust.filters[filter] || filter)
+            .filter(filter => typeof(filter) === 'function');
     } else {
         filters = [];
     }
