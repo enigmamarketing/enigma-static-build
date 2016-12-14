@@ -4,7 +4,7 @@
 var path = require('path');
 var buildDocParse = require('build-doc-parse');
 var deasync = require('deasync');
-var deepAssign = require('deep-assign');
+var deepAssign = require('deep-assign-writable');
 var chalk = require('chalk');
 
 var dust = require('dustjs-linkedin');
