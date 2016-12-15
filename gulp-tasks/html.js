@@ -13,6 +13,36 @@ dust.config.cache = false;
 
 require('dust-naming-convention-filters')(dust);
 
+function hasReadOnlyProperties(object) {
+    return Object.keys(object).some(key => !Object.getOwnPropertyDescriptor(object, key).writable);
+}
+
+function cleanUpEmptyObjects(object) {
+    var keys = Object.keys(object),
+        removedKeyCount = 0;
+
+    if (typeof(object) !== 'object') { return false; }
+
+    keys.forEach(key => {
+        let child = object[key];
+
+        if (hasReadOnlyProperties(child)) { return; }
+
+        if (cleanUpEmptyObjects(child)) {
+            console.log('Removing', key);
+
+            delete object[key];
+            removedKeyCount += 1;
+        }
+    });
+
+    if (removedKeyCount === keys.length) {
+        console.log('Mega remove!', object);
+    }
+
+    return removedKeyCount === keys.length;
+}
+
 function escapeChunk(str, start, end) {
     var original = str.substring(start, end),
         escaped = dust.escapeHtml(original);
@@ -316,7 +346,11 @@ function dustDataProvide(file, buildData) {
         }
     }
 
-    return deepAssign(base, override);
+    deepAssign(base, override);
+
+    cleanUpEmptyObjects(base);
+
+    return base;
 }
 
 function getDataProvider(buildData) {
