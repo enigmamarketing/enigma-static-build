@@ -13,9 +13,5 @@ module.exports = function (error) {
         '\n');
     }
 
-    if (error.cause) {
-        console.dir(error.cause.message);
-    }
-
     this.emit('end');
 };

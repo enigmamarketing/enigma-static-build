@@ -29,16 +29,10 @@ function cleanUpEmptyObjects(object) {
         if (hasReadOnlyProperties(child)) { return; }
 
         if (cleanUpEmptyObjects(child)) {
-            console.log('Removing', key);
-
             delete object[key];
             removedKeyCount += 1;
         }
     });
-
-    if (removedKeyCount === keys.length) {
-        console.log('Mega remove!', object);
-    }
 
     return removedKeyCount === keys.length;
 }
