@@ -6,6 +6,7 @@ var buildDocParse = require('build-doc-parse');
 var deasync = require('deasync');
 var deepAssign = require('deep-assign-writable');
 var chalk = require('chalk');
+var bcp47 = require('bcp-47');
 
 var dust = require('dustjs-linkedin');
 dust.helpers = require('dustjs-helpers').helpers;
@@ -328,6 +329,25 @@ function dustDataProvide(file, buildData) {
     override.language = language;
 
     console.info('Building template \'%s\'...', chalk.green(folder + '/' + template + '-' + language));
+
+    if (language) {
+        bcp47.parse(language, {
+            forgiving: false,
+            warning: (message, code, offset) => {
+                let error = new Error();
+
+                error.showStack = false;
+                error.name = 'LanguageTagError';
+
+                error.message =
+                    message + ' at index ' + offset + '\n' +
+                    language + '\n' +
+                    (offset !== 0 ? '-'.repeat(offset - 1) : '') + '^';
+
+                throw error;
+            }
+        });
+    }
 
     if (folder && template && language) {
         if (buildData[folder] &&
