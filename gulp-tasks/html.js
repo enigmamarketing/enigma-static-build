@@ -291,7 +291,11 @@ function wrappingHelper(tag, defaultAttributes) {
         }
 
         chunk.write('<' + tag + ' ' + attributes.join(' ') + ' ' + tagAttributes.join(' ') + '>');
-        chunk.render(bodies.block, context);
+
+        if (bodies.block) {
+            chunk.render(bodies.block, context);
+        }
+
         chunk.write('</' + tag + '>');
 
         return chunk;
