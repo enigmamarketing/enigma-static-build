@@ -272,6 +272,13 @@ function wrappingHelper(tag, defaultAttributes) {
             tagAttributes = [],
             tagAttributeData, attribute;
 
+        if (!tag) { tag = name; }
+        if (!name) {
+            dustError('No name given to tag that requires it.', 'tag', chunk, context);
+
+            return chunk;
+        }
+
         if (nameContext) { context = context.push(nameContext); }
 
         tagAttributeData = context.stack.head || {};
@@ -297,6 +304,7 @@ dust.helpers.i = wrappingHelper('em');
 dust.helpers.sub = wrappingHelper('sub');
 dust.helpers.sup = wrappingHelper('sup');
 dust.helpers.span = wrappingHelper('span');
+dust.helpers.tag = wrappingHelper();
 dust.helpers.br = function (chunk) { return chunk.write('<br/>'); };
 
 function dustDataProvide(file, buildData) {
