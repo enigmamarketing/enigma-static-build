@@ -268,7 +268,7 @@ function wrappingHelper(tag, defaultAttributes) {
 
     return function (chunk, context, bodies, params) {
         var name = context.resolve(params.name) || tag,
-            nameContext = context.get(name),
+            nameContext = name ? context.get(name) : null,
             tagAttributes = [],
             tagAttributeData, attribute;
 
