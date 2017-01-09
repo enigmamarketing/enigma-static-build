@@ -126,6 +126,8 @@ function dustError(message, helperName, chunk, context, dataOverride) {
         '\n' + chalk.green('Language') + ': ' + chalk.cyan(context.get('language')) +
         data +
     '\n');
+
+    return chunk;
 }
 
 dust.helpers.render = function (chunk, context, bodies, params) {
@@ -133,11 +135,9 @@ dust.helpers.render = function (chunk, context, bodies, params) {
         filters = context.resolve(params.filter);
 
     if (!params.hasOwnProperty('key')) {
-        dustError('No key given to render!', 'render', chunk, context);
-        return chunk;
+        return dustError('No key given to render!', 'render', chunk, context);
     } else if (template === undefined) {
-        dustError('Key doesn\'t exist!', 'render', chunk, context);
-        return chunk;
+        return dustError('Key doesn\'t exist!', 'render', chunk, context);
     }
 
     if (typeof(template) !== typeof(template.valueOf())) {
@@ -189,8 +189,7 @@ dust.helpers.block = function (chunk, context, bodies, params) {
         paramData = {};
 
     if (typeof(template) !== 'string') {
-        dustError('No template given for block.', 'block', chunk, context);
-        return chunk;
+        return dustError('No template given for block.', 'block', chunk, context);
     }
 
     if (!data) { return chunk; }
@@ -240,9 +239,7 @@ function wrappingHelper(tag, defaultName, defaultAttributes) {
             tag = context.resolve(params.tag) || name;
         }
         if (!name) {
-            dustError('No name given to tag that requires it.', 'tag', chunk, context);
-
-            return chunk;
+            return dustError('No name given to tag that requires it.', 'tag', chunk, context);
         }
 
         if (nameContext) { context = context.push(nameContext); }
