@@ -250,6 +250,11 @@ function wrappingHelper(tag, defaultName, defaultAttributes) {
 
         if (bodies.block) {
             chunk.render(bodies.block, context);
+        } else if (tag === 'a' && defaultName === 'link' && context.get('content')) {
+            // TODO: This is a warning added on 2017-01-09. Remove after 2017-07-09.
+            return dustError(
+                'The `link.content` syntax is deprecated! Please use this form: {@link}content{/link}.',
+                'link', chunk, context);
         }
 
         chunk.write('</' + tag + '>');
