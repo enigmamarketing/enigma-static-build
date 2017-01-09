@@ -208,27 +208,33 @@ dust.helpers.block = function (chunk, context, bodies, params) {
     return chunk.partial(template, context.push(paramData));
 };
 
-function wrappingHelper(tag, defaultName, defaultAttributes) {
-    var attribute,
-        attributes = [],
-        defaultName = defaultName || tag;
+function objectPropertiesToAttributes(object) {
+    var attributes = [];
 
-    for (attribute in defaultAttributes) {
-        if (!defaultAttributes.hasOwnProperty(attribute)) { continue; }
-        if (!Object.getOwnPropertyDescriptor(defaultAttributes, attribute).writable) { continue; }
+    for (let attribute in object) {
+        if (!object.hasOwnProperty(attribute)) { continue; }
+        if (!Object.getOwnPropertyDescriptor(object, attribute).writable) { continue; }
 
-        let attributeValue = defaultAttributes[attribute];
+        let attributeValue = object[attribute],
+            attributePrimitiveType = typeof(attributeValue.valueOf());
 
-        if (typeof(attributeValue.valueOf()) === 'string') {
+        if (attributePrimitiveType === 'string' || attributePrimitiveType === 'number') {
             attributes.push(attribute + '="' + dust.escapeHtml(attributeValue) + '"');
         }
     }
 
+    return attributes;
+}
+
+function wrappingHelper(tag, defaultName, defaultAttributes) {
+    var attribute,
+        attributes = objectPropertiesToAttributes(defaultAttributes),
+        defaultName = defaultName || tag;
+
     return function (chunk, context, bodies, params) {
         var name = context.resolve(params.name) || defaultName,
             nameContext = name ? context.get(name) : null,
-            tagAttributes = [],
-            tagAttributeData, attribute;
+            tagAttributes = [];
 
         if (!tag) {
             tag = context.resolve(params.tag) || name;
@@ -241,18 +247,7 @@ function wrappingHelper(tag, defaultName, defaultAttributes) {
 
         if (nameContext) { context = context.push(nameContext); }
 
-        tagAttributeData = context.stack.head || {};
-
-        for (attribute in tagAttributeData) {
-            if (!tagAttributeData.hasOwnProperty(attribute)) { continue; }
-            if (!Object.getOwnPropertyDescriptor(tagAttributeData, attribute).writable) { continue; }
-
-            let attributeValue = tagAttributeData[attribute];
-
-            if (typeof(attributeValue.valueOf()) === 'string') {
-                tagAttributes.push(attribute + '="' + dust.escapeHtml(attributeValue) + '"');
-            }
-        }
+        tagAttributes = objectPropertiesToAttributes(context.stack.head || {});
 
         chunk.write('<' + tag + ' ' + attributes.join(' ') + ' ' + tagAttributes.join(' ') + '>');
 
