@@ -263,7 +263,11 @@ function wrappingHelper(tag, defaultAttributes) {
         if (!defaultAttributes.hasOwnProperty(attribute)) { continue; }
         if (!Object.getOwnPropertyDescriptor(defaultAttributes, attribute).writable) { continue; }
 
-        attributes.push(attribute + '="' + dust.escapeHtml(defaultAttributes[attribute]) + '"');
+        let attributeValue = defaultAttributes[attribute];
+
+        if (typeof(attributeValue.valueOf()) === 'string') {
+            attributes.push(attribute + '="' + dust.escapeHtml(attributeValue) + '"');
+        }
     }
 
     return function (chunk, context, bodies, params) {
@@ -289,7 +293,11 @@ function wrappingHelper(tag, defaultAttributes) {
             if (!tagAttributeData.hasOwnProperty(attribute)) { continue; }
             if (!Object.getOwnPropertyDescriptor(tagAttributeData, attribute).writable) { continue; }
 
-            tagAttributes.push(attribute + '="' + dust.escapeHtml(tagAttributeData[attribute]) + '"');
+            let attributeValue = tagAttributeData[attribute];
+
+            if (typeof(attributeValue.valueOf()) === 'string') {
+                tagAttributes.push(attribute + '="' + dust.escapeHtml(attributeValue) + '"');
+            }
         }
 
         chunk.write('<' + tag + ' ' + attributes.join(' ') + ' ' + tagAttributes.join(' ') + '>');
