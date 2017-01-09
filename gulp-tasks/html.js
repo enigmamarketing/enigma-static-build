@@ -255,9 +255,10 @@ dust.helpers.block = function (chunk, context, bodies, params) {
     return chunk.partial(template, context.push(paramData));
 };
 
-function wrappingHelper(tag, defaultAttributes) {
+function wrappingHelper(tag, defaultName, defaultAttributes) {
     var attribute,
-        attributes = [];
+        attributes = [],
+        defaultName = defaultName || tag;
 
     for (attribute in defaultAttributes) {
         if (!defaultAttributes.hasOwnProperty(attribute)) { continue; }
@@ -271,7 +272,7 @@ function wrappingHelper(tag, defaultAttributes) {
     }
 
     return function (chunk, context, bodies, params) {
-        var name = context.resolve(params.name) || tag,
+        var name = context.resolve(params.name) || defaultName,
             nameContext = name ? context.get(name) : null,
             tagAttributes = [],
             tagAttributeData, attribute;
@@ -312,9 +313,9 @@ function wrappingHelper(tag, defaultAttributes) {
     };
 }
 
-dust.helpers.b = wrappingHelper('strong');
+dust.helpers.b = wrappingHelper('strong', 'b');
 dust.helpers.u = wrappingHelper('u');
-dust.helpers.i = wrappingHelper('em');
+dust.helpers.i = wrappingHelper('em', 'i');
 dust.helpers.sub = wrappingHelper('sub');
 dust.helpers.sup = wrappingHelper('sup');
 dust.helpers.span = wrappingHelper('span');
