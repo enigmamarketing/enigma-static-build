@@ -183,53 +183,6 @@ dust.helpers.render = function (chunk, context, bodies, params) {
 };
 dust.helpers.render.depth = 0;
 
-dust.helpers.link = function (chunk, context, bodies, params) {
-    var link = context.resolve(params.key),
-        name = context.resolve(params.name) || 'link',
-        attribute, attributes = [],
-        nameContext = context.get(name);
-
-    if (params.hasOwnProperty('key') && link === undefined) {
-        dustError('Link key doesn\'t exist!', 'link', chunk, context);
-        return chunk;
-    }
-
-    if (typeof(link) === 'object') {
-        context = context.push(link);
-    } else {
-        if (nameContext) {
-            context = context.push(nameContext);
-        } else {
-            if (name !== 'link') {
-                dustError('No data found for link with name \'' + name + '\'!', 'link', chunk, context);
-            } else {
-                dustError('No data found for link!', 'link', chunk, context);
-            }
-
-            return chunk;
-        }
-    }
-
-    if (!context.get('content', true)) {
-        dustError('No content given for link.', 'link', chunk, context);
-        return chunk;
-    }
-
-    link = context.stack.head || {};
-
-    for (attribute in link) {
-        if (!link.hasOwnProperty(attribute)) { continue; }
-        if (!Object.getOwnPropertyDescriptor(link, attribute).writable) { continue; }
-        if (attribute === 'content') { continue; }
-
-        attributes.push(attribute + '="' + dust.escapeHtml(link[attribute]) + '"');
-    }
-
-    chunk.write('<a ' + attributes.join(' ') + '>' + dust.escapeHtml(context.get('content', true)) + '</a>');
-
-    return chunk;
-};
-
 dust.helpers.block = function (chunk, context, bodies, params) {
     var data = context.resolve(params.path),
         template = context.resolve(params.template),
@@ -319,6 +272,7 @@ dust.helpers.i = wrappingHelper('em', 'i');
 dust.helpers.sub = wrappingHelper('sub');
 dust.helpers.sup = wrappingHelper('sup');
 dust.helpers.span = wrappingHelper('span');
+dust.helpers.link = wrappingHelper('a', 'link');
 dust.helpers.tag = wrappingHelper();
 dust.helpers.br = function (chunk) { return chunk.write('<br/>'); };
 
