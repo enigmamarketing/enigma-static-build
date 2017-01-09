@@ -272,7 +272,9 @@ function wrappingHelper(tag, defaultAttributes) {
             tagAttributes = [],
             tagAttributeData, attribute;
 
-        if (!tag) { tag = name; }
+        if (!tag) {
+            tag = context.resolve(params.tag) || name;
+        }
         if (!name) {
             dustError('No name given to tag that requires it.', 'tag', chunk, context);
 
