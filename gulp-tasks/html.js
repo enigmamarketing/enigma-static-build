@@ -349,7 +349,7 @@ function getDataProvider(buildData) {
 
 function getBuildData() {
     var buildData = {},
-        docsDir = './public';
+        docsDir = './public/documents';
 
     require('fs').readdirSync(docsDir).forEach(function (filename) {
         if (path.extname(filename) !== '.xlsx') { return; }

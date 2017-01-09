@@ -8,8 +8,8 @@ module.exports = function (gulp, taskPrefix) {
             'public/*/**/*.dust',
             'public/*/**/*.json',
             'public/*/**/*.js',
-            'public/*.xlsx',
-            '!public/~$*.xlsx',
+            'public/documents/*.xlsx',
+            '!public/documents/~$*.xlsx',
             '!public/*/js/**/*'
         ], function () {
             gulp.start(taskPrefix + 'html');
