@@ -1,6 +1,7 @@
 /*jslint continue: true */
 'use strict';
 
+var fs = require('fs');
 var path = require('path');
 var buildDocParse = require('build-doc-parse');
 var deasync = require('deasync');
@@ -351,16 +352,20 @@ function getBuildData() {
     var buildData = {},
         docsDir = './public/documents';
 
-    require('fs').readdirSync(docsDir).forEach(function (filename) {
-        if (path.extname(filename) !== '.xlsx') { return; }
-        if (filename.startsWith('~$')) { return; }
+    try {
+        fs.readdirSync(docsDir).forEach(function (filename) {
+            if (path.extname(filename) !== '.xlsx') { return; }
+            if (filename.startsWith('~$')) { return; }
 
-        try {
-            deepAssign(buildData, buildDocParse(path.join(docsDir, filename)));
-        } catch (error) {
-            throw new Error(chalk.white.bgRed('Found in \'' + filename + '\'') + ': ' + error.message);
-        }
-    });
+            try {
+                deepAssign(buildData, buildDocParse(path.join(docsDir, filename)));
+            } catch (error) {
+                throw new Error(chalk.white.bgRed('Found in \'' + filename + '\'') + ': ' + error.message);
+            }
+        });
+    } catch (ex) {
+        console.warn(chalk.yellow('No build documents found in ./public/documents!'));
+    }
 
     return buildData;
 }
