@@ -203,9 +203,7 @@ dust.helpers.block = function (chunk, context, bodies, params) {
         paramData[param] = context.resolve(params[param]);
     }
 
-    Object.assign(paramData, data);
-
-    return chunk.partial(template, context.push(paramData));
+    return chunk.partial(template, context.push(paramData).push(data));
 };
 
 function objectPropertiesToAttributes(object) {
