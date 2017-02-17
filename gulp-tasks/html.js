@@ -228,8 +228,9 @@ function objectPropertiesToAttributes(object) {
 
 function wrappingHelper(tag, defaultName, defaultAttributes) {
     var attribute,
-        attributes = objectPropertiesToAttributes(defaultAttributes),
-        defaultName = defaultName || tag;
+        attributes = objectPropertiesToAttributes(defaultAttributes);
+
+    defaultName = defaultName || tag;
 
     return function (chunk, context, bodies, params) {
         var name = context.resolve(params.name) || defaultName,
