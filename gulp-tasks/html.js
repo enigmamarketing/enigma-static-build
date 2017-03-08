@@ -329,12 +329,13 @@ function dustDataProvide(file, buildData) {
     }
 
     if (folder && template && language) {
-        if (buildData[folder] &&
+        if (buildData &&
+            buildData[folder] &&
             buildData[folder][template] &&
             buildData[folder][template][language]) {
 
             base = buildData[folder][template][language];
-        } else {
+        } else if (buildData) {
             console.warn(chalk.yellow('No data found in build documents for \'%s\'.'), chalk.green(folder + '/' + template + '-' + language));
         }
     }
@@ -369,6 +370,7 @@ function getBuildData() {
         });
     } catch (ex) {
         console.warn(chalk.yellow('No build documents found in ./public/documents!'));
+        buildData = null;
     }
 
     return buildData;
