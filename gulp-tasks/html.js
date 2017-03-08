@@ -279,15 +279,20 @@ function dustDataProvide(file, buildData) {
         override = {},
         pathComponents = path.relative('./public/', file.path).split(path.sep),
         folder = pathComponents[0],
+        templateFileName = pathComponents[pathComponents.length - 1],
         template, templateSplitIndex,
         language;
 
-    pathComponents[1] = pathComponents[1].slice(0, -5);
+    templateFileName = templateFileName.slice(0, -5);
 
-    templateSplitIndex = pathComponents[1].indexOf('-');
+    templateSplitIndex = templateFileName.indexOf('-');
     if (templateSplitIndex > 0) {
-        template = pathComponents[1].substring(0, templateSplitIndex);
-        language = pathComponents[1].substring(templateSplitIndex + 1);
+        template = templateFileName.substring(0, templateSplitIndex);
+        language = templateFileName.substring(templateSplitIndex + 1);
+    }
+
+    if (pathComponents.length > 2) {
+        template = pathComponents.slice(1, pathComponents.length - 1).join('-') + '-' + template;
     }
 
     try {
