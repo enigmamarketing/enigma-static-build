@@ -273,6 +273,37 @@ dust.helpers.link = wrappingHelper('a', 'link');
 dust.helpers.tag = wrappingHelper();
 dust.helpers.br = function (chunk) { return chunk.write('<br/>'); };
 
+function wrapDustOnLoad() {
+    var onLoad = dust.onLoad;
+
+    return function (name, options, callback) {
+        var partialPath = path.join(process.cwd(), 'public', options.folder, 'partials', name + '.dust');
+
+        fs.readFile(partialPath, 'utf8', (error, template) => {
+            if (error) {
+                // Fallback to default!
+
+                if (onLoad) {
+                    if (onLoad.length === 3) {
+                        return onLoad(name, options, callback);
+                    } else {
+                        return onLoad(name, callback);
+                    }
+                } else {
+                    console.error('Template ' + error.path + ' does not exist');
+                    return callback(error);
+                }
+            }
+
+            try {
+                callback(null, template);
+            } catch (error) {
+                callback(error);
+            }
+        });
+    };
+}
+
 function dustDataProvide(file, buildData) {
     var dataPath,
         base = {},
@@ -344,7 +375,7 @@ function dustDataProvide(file, buildData) {
 
     cleanUpEmptyObjects(base);
 
-    return base;
+    return dust.context({}, { folder: folder }).push(base);
 }
 
 function getDataProvider(buildData) {
@@ -387,11 +418,14 @@ module.exports = function (gulp) {
                 basePath: 'public',
                 data: getDataProvider(buildData),
                 whitespace: true
-            };
+            },
+            dustHtmlInstance = dustHtml(dustOptions);
+
+        dust.onLoad = wrapDustOnLoad();
 
         return gulp.src(['public/*/**/*.dust', '!public/*/**/partials/**'])
             .pipe(plumber({ errorHandler: errorHandler }))
-            .pipe(dustHtml(dustOptions))
+            .pipe(dustHtmlInstance)
             .pipe(plumber.stop())
             .pipe(gulp.dest('../dist/'));
     };
