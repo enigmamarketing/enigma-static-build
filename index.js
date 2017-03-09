@@ -41,6 +41,8 @@ module.exports = function (gulp, projectRoot, createPrefixlessTasks) {
         gulp.task('default', [ taskPrefix + 'default' ]);
         gulp.task('develop', [ taskPrefix + 'develop' ]);
         gulp.task('clean', [ taskPrefix + 'clean' ]);
+
+        gulp.task('extract-locals', [ taskPrefix + 'extract-locals' ]);
     }
 
     if (!deploymentTasks) {

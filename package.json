@@ -1,6 +1,6 @@
 {
   "name": "enigma-static-build",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -43,7 +43,8 @@
     "gulp-sourcemaps": "^1.6.0",
     "gulp-uglify": "^2.0.0",
     "gulp-watch": "^4.3.5",
-    "merge-stream": "^1.0.0"
+    "merge-stream": "^1.0.0",
+    "mkdirp": "^0.5.1"
   },
   "optionalDependencies": {
     "enigma-static-build-deployment": "git+ssh://git@bitbucket.org:enigmamarketingdigital/enigma-static-build-deployment.git"
