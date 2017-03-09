@@ -3,41 +3,17 @@
 
 var fs = require('fs');
 var path = require('path');
-var buildDocParse = require('build-doc-parse');
+
+var buildDocProvider = require('../util/build-document-provider');
 var deasync = require('deasync');
 var deepAssign = require('deep-assign-writable');
 var chalk = require('chalk');
-var bcp47 = require('bcp-47');
 
 var dust = require('dustjs-linkedin');
 dust.helpers = require('dustjs-helpers').helpers;
 dust.config.cache = false;
 
 require('dust-naming-convention-filters')(dust);
-
-function hasReadOnlyProperties(object) {
-    return Object.keys(object).some(key => !Object.getOwnPropertyDescriptor(object, key).writable);
-}
-
-function cleanUpEmptyObjects(object) {
-    var keys = Object.keys(object),
-        removedKeyCount = 0;
-
-    if (typeof(object) !== 'object') { return false; }
-
-    keys.forEach(key => {
-        let child = object[key];
-
-        if (hasReadOnlyProperties(child)) { return; }
-
-        if (cleanUpEmptyObjects(child)) {
-            delete object[key];
-            removedKeyCount += 1;
-        }
-    });
-
-    return removedKeyCount === keys.length;
-}
 
 function escapeChunk(str, start, end) {
     var original = str.substring(start, end),
@@ -304,119 +280,16 @@ function wrapDustOnLoad() {
     };
 }
 
-function dustDataProvide(file, buildData) {
-    var dataPath,
-        base = {},
-        override = {},
-        pathComponents = path.relative('./public/', file.path).split(path.sep),
-        folder = pathComponents[0],
-        templateFileName = pathComponents[pathComponents.length - 1],
-        template, templateSplitIndex,
-        language;
-
-    templateFileName = templateFileName.slice(0, -5);
-
-    templateSplitIndex = templateFileName.indexOf('-');
-    if (templateSplitIndex > 0) {
-        template = templateFileName.substring(0, templateSplitIndex);
-        language = templateFileName.substring(templateSplitIndex + 1);
-    }
-
-    if (pathComponents.length > 2) {
-        template = pathComponents.slice(1, pathComponents.length - 1).join('-') + '-' + template;
-    }
-
-    try {
-        dataPath = file.path.slice(0, -5);
-
-        if (require.cache[require.resolve(dataPath)]) {
-            delete require.cache[require.resolve(dataPath)];
-        }
-
-        override = require(dataPath);
-    } catch (ex) { }
-
-    override.language = language;
-
-    console.info('Building template \'%s\'...', chalk.green(folder + '/' + template + '-' + language));
-
-    if (language) {
-        bcp47.parse(language, {
-            forgiving: false,
-            warning: (message, code, offset) => {
-                let error = new Error();
-
-                error.showStack = false;
-                error.name = 'LanguageTagError';
-
-                error.message =
-                    message + ' at index ' + offset + '\n' +
-                    language + '\n' +
-                    (offset !== 0 ? '-'.repeat(offset - 1) : '') + '^';
-
-                throw error;
-            }
-        });
-    }
-
-    if (folder && template && language) {
-        if (buildData &&
-            buildData[folder] &&
-            buildData[folder][template] &&
-            buildData[folder][template][language]) {
-
-            base = buildData[folder][template][language];
-        } else if (buildData) {
-            console.warn(chalk.yellow('No data found in build documents for \'%s\'.'), chalk.green(folder + '/' + template + '-' + language));
-        }
-    }
-
-    deepAssign(base, override);
-
-    cleanUpEmptyObjects(base);
-
-    return dust.context({}, { folder: folder }).push(base);
-}
-
-function getDataProvider(buildData) {
-    return function (file) {
-        return dustDataProvide(file, buildData);
-    };
-}
-
-function getBuildData() {
-    var buildData = {},
-        docsDir = './public/documents';
-
-    try {
-        fs.readdirSync(docsDir).forEach(function (filename) {
-            if (path.extname(filename) !== '.xlsx') { return; }
-            if (filename.startsWith('~$')) { return; }
-
-            try {
-                deepAssign(buildData, buildDocParse(path.join(docsDir, filename)));
-            } catch (error) {
-                throw new Error(chalk.white.bgRed('Found in \'' + filename + '\'') + ': ' + error.message);
-            }
-        });
-    } catch (ex) {
-        console.warn(chalk.yellow('No build documents found in ./public/documents!'));
-        buildData = null;
-    }
-
-    return buildData;
-}
-
 module.exports = function (gulp) {
     var plumber = require('gulp-plumber');
     var errorHandler = require('../gulp-error-handler');
     var dustHtml = require('gulp-dust-html');
 
     return function () {
-        var buildData = getBuildData(),
+        var buildData = buildDocProvider.getData(),
             dustOptions = {
                 basePath: 'public',
-                data: getDataProvider(buildData),
+                data: buildDocProvider.provide(buildData, true),
                 whitespace: true
             },
             dustHtmlInstance = dustHtml(dustOptions);
