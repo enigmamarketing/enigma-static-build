@@ -1,6 +1,6 @@
 {
   "name": "enigma-static-build",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -35,6 +35,7 @@
     "gulp-browser": "^3.0.2",
     "gulp-cssnano": "^2.0.0",
     "gulp-dust-html": "0.0.5",
+    "gulp-foreach": "^0.1.0",
     "gulp-jslint": "^1.0.5",
     "gulp-plumber": "^1.0.1",
     "gulp-postcss": "^6.0.1",
