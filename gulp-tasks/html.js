@@ -109,8 +109,8 @@ function dustError(message, helperName, chunk, context, dataOverride) {
 
 dust.helpers.render = function (chunk, context, bodies, params) {
     var template = context.resolve(params.key),
-        templateType = typeof template,
-        templatePrimitiveType = typeof template.valueOf(),
+        templateType,
+        templatePrimitiveType,
         filters = context.resolve(params.filter),
         keyLabel = typeof params.key === 'string' ? 'Key (' + params.key + ')' : 'Key';
 
@@ -119,6 +119,9 @@ dust.helpers.render = function (chunk, context, bodies, params) {
     } else if (template === undefined) {
         return dustError(keyLabel + ' doesn\'t exist!', 'render', chunk, context);
     }
+
+    templateType = typeof template;
+    templatePrimitiveType = typeof template.valueOf();
 
     if (templatePrimitiveType === 'object') {
         return dustError(keyLabel + ' exists, but there\'s no template!', 'render', chunk, context);
