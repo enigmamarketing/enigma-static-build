@@ -130,7 +130,7 @@ dust.helpers.render = function (chunk, context, bodies, params) {
 
         filters = filters
             .map(filter => dust.filters[filter] || filter)
-            .filter(filter => typeof(filter) === 'function');
+            .filter(filter => typeof filter === 'function');
     } else {
         filters = [];
     }
@@ -142,7 +142,7 @@ dust.helpers.render = function (chunk, context, bodies, params) {
             dust.helpers.render.depth -= 1;
 
             if (error) {
-                if (typeof(error) === 'string') {
+                if (typeof error === 'string') {
                     chunk.setError(error);
                 } else {
                     dustError(error.message, 'render', chunk, context, template);
@@ -165,7 +165,7 @@ dust.helpers.block = function (chunk, context, bodies, params) {
         template = context.resolve(params.template),
         paramData = {};
 
-    if (typeof(template) !== 'string') {
+    if (typeof template !== 'string') {
         return dustError('No template given for block.', 'block', chunk, context);
     }
 
@@ -190,7 +190,7 @@ function objectPropertiesToAttributes(object) {
         if (!Object.getOwnPropertyDescriptor(object, attribute).writable) { continue; }
 
         let attributeValue = object[attribute],
-            attributePrimitiveType = typeof(attributeValue.valueOf());
+            attributePrimitiveType = typeof attributeValue.valueOf();
 
         if (attributePrimitiveType === 'string' || attributePrimitiveType === 'number') {
             attributes.push(attribute + '="' + dust.escapeHtml(attributeValue) + '"');
