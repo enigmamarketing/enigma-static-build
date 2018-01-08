@@ -1,6 +1,6 @@
 {
   "name": "enigma-static-build",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -13,7 +13,7 @@
   "keywords": [
     "enigma-marketing-services"
   ],
-  "author": "Steffan Donal <steffan@sdonalcreative.uk> (https://sdonalcreative.uk/)",
+  "author": "Richard Chapman <richard@enigma-marketing.co.uk>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/enigmamarketing/enigma-static-build/issues"
