@@ -1,6 +1,6 @@
 {
   "name": "enigma-static-build",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -48,6 +48,6 @@
     "mkdirp": "^0.5.1"
   },
   "optionalDependencies": {
-    "enigma-static-build-deployment": "git+ssh://git@bitbucket.org:enigmamarketingdigital/enigma-static-build-deployment.git"
+    "enigma-static-build-deployment": "git+ssh://git@gitlab.com:enigma-marketing/enigma-marketing/enigma-static-build-deployment.git"
   }
 }
